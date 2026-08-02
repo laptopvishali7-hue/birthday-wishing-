@@ -1,0 +1,15 @@
+{
+  "entities": {
+    "Wish": {
+      "collectionName": "wishes",
+      "description": "Stores customized birthday wish data including photos, songs, letters, and interactive stages",
+      "fields": {
+        "id": { "type": "string", "description": "Unique wish identifier" },
+        "recipientName": { "type": "string", "description": "Name of the birthday person" },
+        "fullData": { "type": "map", "description": "Complete WishData object" },
+        "createdAt": { "type": "number", "description": "Timestamp when created" },
+        "creatorName": { "type": "string", "description": "Creator profile name" }
+      }
+    }
+  }
+}

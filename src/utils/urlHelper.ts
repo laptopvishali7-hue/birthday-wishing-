@@ -1,9 +1,10 @@
 import { WishData, DEFAULT_WISH_DATA } from '../types';
+import { saveWishToFirebase, getWishFromFirebase } from '../lib/firebaseService';
 
 const STORAGE_KEY_PREFIX = 'birthday_wish_';
 const MY_WISHES_KEY = 'my_created_wishes_list';
 
-// Save wish to localStorage
+// Save wish to localStorage and Firebase Firestore cloud
 export function saveWishToStorage(wish: WishData): void {
   try {
     localStorage.setItem(`${STORAGE_KEY_PREFIX}${wish.id}`, JSON.stringify(wish));
@@ -12,6 +13,11 @@ export function saveWishToStorage(wish: WishData): void {
     const existingList = getCreatedWishesList();
     const updated = [wish, ...existingList.filter(w => w.id !== wish.id)];
     localStorage.setItem(MY_WISHES_KEY, JSON.stringify(updated));
+
+    // Save to Cloud Firestore in background
+    saveWishToFirebase(wish).catch((err) => {
+      console.warn('Background Firebase save error:', err);
+    });
   } catch (err) {
     console.warn('LocalStorage error:', err);
   }
@@ -92,9 +98,12 @@ export function getCustomizedNameUrl(name: string): string {
   return `${baseUrl}?name=${encodeURIComponent(cleanName)}`;
 }
 
-// Generate direct full wish link
+// Generate direct full wish link and sync to Firebase Cloud
 export function getShareableWishUrl(wish: WishData): string {
+  // 1. Save locally and to Firebase Cloud
   saveWishToStorage(wish);
+
+  // 2. Generate clean cloud link with fallback hash
   const hash = encodeWishToHash(wish);
   const baseUrl = window.location.origin + window.location.pathname;
   const nameParam = wish.recipientName ? `&name=${encodeURIComponent(wish.recipientName)}` : '';
@@ -114,6 +123,7 @@ export function getWhatsAppShareUrl(wish: WishData): string {
   const text = `🎉 I created a special interactive Birthday Surprise for you, ${wish.recipientName}! 🎁✨\n\nTap the link to unwrap your gift: ${link}`;
   return `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
 }
+
 
 // Simple SVG QR Code Generator
 export function generateQrCodeSvg(url: string): string {

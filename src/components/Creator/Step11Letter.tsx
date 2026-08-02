@@ -1,5 +1,7 @@
 import React from 'react';
 import { WishData } from '../../types';
+import { getUserProfile } from '../../utils/userAuth';
+import { Sparkles, UserCheck } from 'lucide-react';
 
 interface Step11LetterProps {
   wish: WishData;
@@ -14,6 +16,15 @@ export const Step11Letter: React.FC<Step11LetterProps> = ({
   onFinish,
   onPreview,
 }) => {
+  const currentUser = getUserProfile();
+
+  const handleApplySignature = () => {
+    if (currentUser?.signature) {
+      onChange({
+        letter: { ...wish.letter, signOff: currentUser.signature },
+      });
+    }
+  };
   return (
     <div className="w-full max-w-2xl mx-auto p-4 space-y-6 animate-fadeIn pb-12">
       <div className="space-y-1">
@@ -64,9 +75,23 @@ export const Step11Letter: React.FC<Step11LetterProps> = ({
 
         {/* Sign-Off */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold uppercase tracking-wider text-pink-300">
-            SIGN-OFF
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-bold uppercase tracking-wider text-pink-300">
+              SIGN-OFF
+            </label>
+
+            {currentUser && (
+              <button
+                type="button"
+                onClick={handleApplySignature}
+                className="text-xs text-amber-300 hover:text-amber-200 font-semibold flex items-center gap-1 bg-amber-400/10 px-2.5 py-1 rounded-full border border-amber-400/30 transition-all cursor-pointer"
+              >
+                <UserCheck className="w-3 h-3 text-amber-400" />
+                <span>Use My Signature ("{currentUser.signature}")</span>
+              </button>
+            )}
+          </div>
+
           <input
             type="text"
             value={wish.letter.signOff}

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { WishData, DEFAULT_WISH_DATA } from '../types';
 import { getCreatedWishesList, deleteWishFromStorage, getShareableWishUrl, getCustomizedNameUrl, getWhatsAppShareNameUrl } from '../utils/urlHelper';
-import { Plus, Gift, Sparkles, Play, Share2, Heart, Copy, Check, Send, Link, Trash2 } from 'lucide-react';
+import { getUserProfile, UserProfile } from '../utils/userAuth';
+import { UserAuthModal } from './UserAuthModal';
+import { Plus, Gift, Sparkles, Play, Share2, Heart, Copy, Check, Send, Link, Trash2, User, UserCheck } from 'lucide-react';
 
 interface HomeDashboardProps {
   onStartNew: () => void;
@@ -19,6 +21,8 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   const [friendNameInput, setFriendNameInput] = useState('Rahul');
   const [generatedLink, setGeneratedLink] = useState('');
   const [linkCopied, setLinkCopied] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => getUserProfile());
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleDeleteWish = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -51,8 +55,38 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-[#0f0814] text-white font-sans-custom p-4 sm:p-6 max-w-xl mx-auto space-y-8 relative z-10 pb-20">
+      {/* Top User Sign In / Profile Navigation Bar */}
+      <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">🎂</span>
+          <span className="text-xs font-bold text-pink-300 tracking-wider uppercase">Wish Studio</span>
+        </div>
+
+        <button
+          onClick={() => setIsAuthModalOpen(true)}
+          className={`px-3.5 py-1.5 rounded-full border text-xs font-bold flex items-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer ${
+            currentUser
+              ? 'bg-pink-500/20 border-pink-400 text-pink-200 hover:bg-pink-500/30'
+              : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+          }`}
+        >
+          {currentUser ? (
+            <>
+              <span className="text-sm">{currentUser.avatar}</span>
+              <span className="truncate max-w-[100px] sm:max-w-[140px]">{currentUser.name}</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            </>
+          ) : (
+            <>
+              <User className="w-3.5 h-3.5 text-pink-300" />
+              <span>User Sign In</span>
+            </>
+          )}
+        </button>
+      </div>
+
       {/* App Branding Header */}
-      <div className="text-center space-y-3 pt-6 animate-fadeIn">
+      <div className="text-center space-y-3 pt-2 animate-fadeIn">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-500/10 border border-pink-500/30 text-xs font-semibold text-pink-300">
           <Sparkles className="w-3.5 h-3.5 text-pink-400 animate-pulse" />
           <span>Interactive Birthday Wish Generator</span>
@@ -67,101 +101,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </p>
       </div>
 
-      {/* Quick Instant Shareable Link Generator Box */}
-      <div className="p-5 rounded-3xl bg-[#180e24] border-2 border-pink-500/30 shadow-2xl space-y-4 text-left">
-        <div className="flex items-center gap-2 text-pink-300 font-bold text-base">
-          <Link className="w-5 h-5 text-pink-400" />
-          <span>Quick Shareable Wish Link</span>
-        </div>
-        <p className="text-xs text-pink-200/70 leading-relaxed">
-          Enter your friend's name to generate an instant customized link (e.g. <code>index.html?name=Rahul</code>). When opened, it displays: <strong>"Happy Birthday Rahul!"</strong>
-        </p>
 
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-semibold text-pink-200 mb-1">
-              Friend's Name
-            </label>
-            <input
-              type="text"
-              value={friendNameInput}
-              onChange={(e) => setFriendNameInput(e.target.value)}
-              placeholder="Enter name (e.g. Rahul)"
-              className="w-full px-4 py-3 rounded-xl bg-black/40 border border-pink-500/40 text-white font-medium text-sm focus:outline-none focus:border-pink-400"
-            />
-          </div>
-
-          <button
-            onClick={handleGenerateLink}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-bold text-sm shadow-lg shadow-pink-500/25 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>Generate Shareable Link</span>
-          </button>
-
-          {generatedLink && (
-            <div className="p-3.5 rounded-2xl bg-black/50 border border-pink-500/40 space-y-2 animate-fadeIn">
-              <p className="text-[11px] text-pink-300 font-mono break-all bg-black/40 p-2 rounded-lg border border-white/10">
-                {generatedLink}
-              </p>
-
-              <div className="flex items-center gap-2 pt-1">
-                <button
-                  onClick={handleCopyGeneratedLink}
-                  className="flex-1 py-2 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/40 text-amber-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                >
-                  {linkCopied ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      Copy Link
-                    </>
-                  )}
-                </button>
-
-                <a
-                  href={getWhatsAppShareNameUrl(friendNameInput)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer text-center flex items-center justify-center"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  WhatsApp
-                </a>
-
-                <button
-                  onClick={() => {
-                    const customWish: WishData = {
-                      ...DEFAULT_WISH_DATA,
-                      id: `wish_${Date.now()}`,
-                      recipientName: friendNameInput || 'Friend',
-                    };
-                    onOpenWish(customWish);
-                  }}
-                  className="px-3 py-2 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/40 text-pink-200 font-bold text-xs transition-all cursor-pointer"
-                >
-                  Preview
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Main Full Customization CTA Button */}
-      <div className="text-center pt-2">
-        <button
-          onClick={onStartNew}
-          className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-pink-500 via-rose-500 to-amber-500 hover:brightness-110 text-white font-bold text-base shadow-xl shadow-pink-500/30 active:scale-95 transition-all flex items-center justify-center gap-2.5 mx-auto cursor-pointer"
-        >
-          <Plus className="w-5 h-5 stroke-[3]" />
-          <span>Build Full Multi-Stage Surprise</span>
-        </button>
-      </div>
 
       {/* Features Showcase Pill Badges */}
       <div className="grid grid-cols-2 gap-2.5 text-xs text-pink-200/80">
@@ -267,6 +207,25 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Main Full Customization CTA Button at Bottom */}
+      <div className="text-center pt-6">
+        <button
+          onClick={onStartNew}
+          className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-pink-500 via-rose-500 to-amber-500 hover:brightness-110 text-white font-bold text-base shadow-xl shadow-pink-500/30 active:scale-95 transition-all flex items-center justify-center gap-2.5 mx-auto cursor-pointer"
+        >
+          <Plus className="w-5 h-5 stroke-[3]" />
+          <span>Build Full Multi-Stage Surprise</span>
+        </button>
+      </div>
+
+      {/* User Auth Modal */}
+      <UserAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        currentUser={currentUser}
+        onUserChange={(updated) => setCurrentUser(updated)}
+      />
     </div>
   );
 };

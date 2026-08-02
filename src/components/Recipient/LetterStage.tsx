@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { WishData } from '../../types';
-import { RotateCcw, Heart, Sparkles, Plus } from 'lucide-react';
+import { RotateCcw, Heart, Sparkles, Plus, Edit3 } from 'lucide-react';
 
 interface LetterStageProps {
   wish: WishData;
   onFinishJourney: () => void;
+  onEditWish?: () => void;
 }
 
-export const LetterStage: React.FC<LetterStageProps> = ({ wish, onFinishJourney }) => {
+export const LetterStage: React.FC<LetterStageProps> = ({ wish, onFinishJourney, onEditWish }) => {
   const [envelopeOpened, setEnvelopeOpened] = useState(false);
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -85,6 +86,16 @@ export const LetterStage: React.FC<LetterStageProps> = ({ wish, onFinishJourney 
               <RotateCcw className="w-3.5 h-3.5" />
               Watch it again
             </button>
+
+            {onEditWish && (
+              <button
+                onClick={onEditWish}
+                className="px-5 py-2.5 rounded-full bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/40 text-xs font-semibold text-pink-200 flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+                Edit Wish
+              </button>
+            )}
 
             <button
               onClick={onFinishJourney}

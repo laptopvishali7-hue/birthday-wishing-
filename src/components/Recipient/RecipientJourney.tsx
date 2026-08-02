@@ -59,18 +59,8 @@ export const RecipientJourney: React.FC<RecipientJourneyProps> = ({
       {/* Background Animated Theme Canvas */}
       <ThemeCanvas theme={wish.theme} />
 
-      {/* Floating Top Controls (Audio Mute Toggle & Exit Preview) */}
+      {/* Floating Top Controls (Audio Mute Toggle) */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
-        {onExitPreview && (
-          <button
-            onClick={onExitPreview}
-            className="px-3.5 py-1.5 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 text-xs font-semibold text-white backdrop-blur-md flex items-center gap-1.5 transition-all shadow-lg active:scale-95 cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Edit Wish
-          </button>
-        )}
-
         <button
           onClick={handleMuteToggle}
           className="p-2.5 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 text-pink-300 hover:text-white backdrop-blur-md transition-all shadow-lg active:scale-95 cursor-pointer"
@@ -142,6 +132,7 @@ export const RecipientJourney: React.FC<RecipientJourneyProps> = ({
           onFinishJourney={() => {
             if (onCreateNew) onCreateNew();
           }}
+          onEditWish={onExitPreview}
         />
       )}
     </div>
