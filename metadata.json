@@ -1,0 +1,6 @@
+{
+  "name": "Birthday Wish Journey Creator",
+  "description": "Create, customize, and share interactive magical birthday wish websites for your friends with 3D gifts, candle blowing, photo memories, games, balloon popping, scratch card reveal, and handwritten letters.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
